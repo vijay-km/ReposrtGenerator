@@ -21,3 +21,7 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
+file:
+  input-path: /home/odin/springboot/ReportGenerator_Proj/ReposrtGenerator/accounts/src/main/java/com/example/accounts/storage/input.csv
+  reference-path: /home/odin/springboot/ReportGenerator_Proj/ReposrtGenerator/accounts/src/main/java/com/example/accounts/storage/reference.csv
+  output-path: /home/odin/springboot/ReportGenerator_Proj/ReposrtGenerator/accounts/src/main/java/com/example/accounts/storage/output.csv

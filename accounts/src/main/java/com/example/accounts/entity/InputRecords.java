@@ -25,15 +25,16 @@ public class InputRecords {
     @NotBlank
     private String field2;
 
-    @NotBlank
-    private String field3;
+    @NotNull
+    @Digits(integer = 10, fraction = 4)
+    private BigDecimal field3;
 
     @NotBlank
     private String field4;
 
     @NotNull
     @Digits(integer = 10, fraction = 4)
-    private String field5;
+    private BigDecimal field5;
 
     @NotBlank
     private String refkey1;
