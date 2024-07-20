@@ -1,14 +1,11 @@
 package com.example.accounts.contoller;
 
-import com.example.accounts.constants.AccountsConstants;
 import com.example.accounts.constants.FileUploadConstant;
-import com.example.accounts.dto.CustomerDto;
 import com.example.accounts.dto.ErrorResponseDto;
 import com.example.accounts.dto.ReportDto;
 import com.example.accounts.dto.ResponseDto;
 import java.util.ArrayList;
 import com.example.accounts.entity.OutputRecord;
-import com.example.accounts.service.IAccountsService;
 import com.example.accounts.service.IReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,10 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +26,8 @@ import java.util.List;
 
 
 @Tag(
-        name = "CRUD REST APIs for Accounts in EazyBank",
-        description = "CRUD REST APIs in EazyBank to CREATE, UPDATE, FETCH AND DELETE account details"
+        name = "CRUD REST APIs for RportGenerator",
+        description = "Service to generate Report"
 )
 @RestController
 @RequestMapping(path = "/api/v1", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -40,18 +35,16 @@ import java.util.List;
 @Validated
 public class AccountsController {
 
-    private IAccountsService iAccountsService;
-
     private IReportService iReportService;
 
     @Operation(
-            summary = "Create Account REST API",
-            description = "REST API to create new Customer &  Account inside EazyBank"
+            summary = "Upload file REST API",
+            description = "REST API to upload file"
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
-                    description = "HTTP Status CREATED"
+                    description = "HTTP Status uploaded"
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -62,14 +55,6 @@ public class AccountsController {
             )
     }
     )
-    @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createAccount(@Valid @RequestBody CustomerDto customerDto){
-        iAccountsService.CreateAccount(customerDto);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ResponseDto(AccountsConstants.STATUS_201,AccountsConstants.MESSAGE_201));
-    }
 
     @PostMapping(value = "/uploadInputFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto> UploadReport(
@@ -89,6 +74,24 @@ public class AccountsController {
         }
     }
 
+    @Operation(
+            summary = "Generate report via REST API",
+            description = "Generate report via REST API"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status generated"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @PostMapping(value = "/generateReport", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReportDto> generateReport() {
         try {
