@@ -26,7 +26,7 @@ The scheduler log demonstrates the process of handling input and output files fr
 ### Upload File API
 The Upload File API allows users to upload files directly to the server. Once the file is uploaded, the Generate Report API can be invoked to produce the desired report.
 ![Upload File](https://github.com/vijay-km/ReposrtGenerator/blob/master/accounts/assets/upload.png)
-![Generate Report]([https://github.com/vijay-km/ReposrtGenerator/blob/master/accounts/assets/generateReport.png])
+![Generate Report]([[https://github.com/vijay-km/ReposrtGenerator/blob/master/accounts/assets/generateReport.png]](https://github.com/vijay-km/ReposrtGenerator/blob/master/accounts/assets/generateRe%5Bort.png))
 
 ### Future Enhancements
 - **Factory Design Pattern**: The current implementation uses the Factory Design Pattern, which allows for easy extension in the future. We plan to support additional file formats such as Excel and JSON.
