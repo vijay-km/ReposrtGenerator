@@ -8,8 +8,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ResponseDto {
+public class ReportDto {
     private String statusCode;
     private String statusMessage;
-
+    private List<OutputRecord> outputRecords;
 }

@@ -1,6 +1,8 @@
 package com.example.accounts.service.impl;
 
+import com.example.accounts.dto.ReportDto;
 import com.example.accounts.entity.InputRecords;
+import com.example.accounts.entity.OutputRecord;
 import com.example.accounts.entity.ReferenceRecord;
 import com.example.accounts.repository.InputRecordsRepository;
 import com.example.accounts.repository.ReferenceRecordRepository;
@@ -8,6 +10,8 @@ import com.example.accounts.service.FileProcessor;
 import com.example.accounts.service.IGetFileServices;
 import com.example.accounts.service.IReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import  com.example.accounts.FileProcessorFactory.Factory;
@@ -15,6 +19,7 @@ import com.example.accounts.util.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,5 +64,19 @@ public class ReportServiceImpl implements IReportService {
         }
     }
 
+
+    @Override
+    public List<OutputRecord> generateReport() throws IOException {
+        try {
+            List<InputRecords> inputRecords = inputRecordRepository.findAll();
+            List<ReferenceRecord> referenceRecords = referenceRecordRepository.findAll();
+            List<OutputRecord> outputRecords = iGetFileServices.generateOutputFile(inputRecords, referenceRecords);
+
+            return outputRecords;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Failed to generate report: " + e.getMessage(), e);
+        }
+    }
 
 }

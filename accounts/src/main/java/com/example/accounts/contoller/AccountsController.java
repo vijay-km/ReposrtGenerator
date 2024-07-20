@@ -4,8 +4,10 @@ import com.example.accounts.constants.AccountsConstants;
 import com.example.accounts.constants.FileUploadConstant;
 import com.example.accounts.dto.CustomerDto;
 import com.example.accounts.dto.ErrorResponseDto;
+import com.example.accounts.dto.ReportDto;
 import com.example.accounts.dto.ResponseDto;
-import com.example.accounts.entity.Customer;
+import java.util.ArrayList;
+import com.example.accounts.entity.OutputRecord;
 import com.example.accounts.service.IAccountsService;
 import com.example.accounts.service.IReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @Tag(
@@ -69,8 +71,8 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_201,AccountsConstants.MESSAGE_201));
     }
 
-    @PostMapping(value = "/GenerateReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto> generateReport(
+    @PostMapping(value = "/uploadInputFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto> UploadReport(
             @RequestParam("input") MultipartFile inputFile,
             @RequestParam("reference") MultipartFile referenceFile) {
 
@@ -84,6 +86,21 @@ public class AccountsController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto(FileUploadConstant.STATUS_500, "Failed to generate report"));
+        }
+    }
+
+    @PostMapping(value = "/generateReport", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReportDto> generateReport() {
+        try {
+            List<OutputRecord> outputRecords = iReportService.generateReport();
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ReportDto(FileUploadConstant.STATUS_200, "Report generated successfully", outputRecords));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ReportDto("400", "Failed to generate report: " + e.getMessage(), new ArrayList<>()));
         }
     }
 

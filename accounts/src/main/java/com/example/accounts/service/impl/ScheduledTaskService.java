@@ -46,42 +46,47 @@ public class ScheduledTaskService {
     @Autowired
     private ReferenceRecordRepository referenceRecordRepository;
 
-    private static final String INPUT_FILE_PATH = "src/main/java/com/example/accounts/storage/input.csv";
-    private static final String REFERENCE_FILE_PATH = "src/main/java/com/example/accounts/storage/input.csv";
-
-
-
     public void processFiles() {
         logger.info("Scheduled task started.");
+
         File inputFile = new File(inputPath);
         File referenceFile = new File(referencePath);
 
-        boolean ispresent = inputFile.exists();
+        if (!inputFile.exists() && !referenceFile.exists()) {
+            logger.error("Neither input file nor reference file exists.");
+            return;
+        }
 
-        if (inputFile.exists() && referenceFile.exists()) {
-            try {
-                logger.info("Processing files: {} and {}", inputFile.getName(), referenceFile.getName());
-                String inputFileType = iGetFileServices.getFileExtension(inputFile.getName());
-                String referenceFileType = iGetFileServices.getFileExtension(referenceFile.getName());
+        if (!inputFile.exists()) {
+            logger.error("Input file does not exist: {}", inputPath);
+            return;
+        }
 
-                FileProcessor<InputRecords> inputProcessor = (FileProcessor<InputRecords>) fileProcessorFactory.getFileProcessor(inputFileType,InputRecords.class);
-                FileProcessor<ReferenceRecord> referenceProcessor = (FileProcessor<ReferenceRecord>) fileProcessorFactory.getFileProcessor(referenceFileType,ReferenceRecord.class);
+        if (!referenceFile.exists()) {
+            logger.error("Reference file does not exist: {}", referencePath);
+            return;
+        }
 
-                List<InputRecords> inputRecords = inputProcessor.processFile( inputFile);
-                List<ReferenceRecord> referenceRecords = referenceProcessor.processFile(referenceFile);
+        try {
+            logger.info("Processing files: {} and {}", inputFile.getName(), referenceFile.getName());
 
-                inputRecordsRepository.saveAll(inputRecords);
-                referenceRecordRepository.saveAll(referenceRecords);
+            String inputFileType = iGetFileServices.getFileExtension(inputFile.getName());
+            String referenceFileType = iGetFileServices.getFileExtension(referenceFile.getName());
 
-                iGetFileServices.generateOutputFile(inputRecords, referenceRecords);
+            FileProcessor<InputRecords> inputProcessor = (FileProcessor<InputRecords>) fileProcessorFactory.getFileProcessor(inputFileType, InputRecords.class);
+            FileProcessor<ReferenceRecord> referenceProcessor = (FileProcessor<ReferenceRecord>) fileProcessorFactory.getFileProcessor(referenceFileType, ReferenceRecord.class);
 
-//                inputFile.delete();
-//                referenceFile.delete();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            List<InputRecords> inputRecords = inputProcessor.processFile(inputFile);
+            List<ReferenceRecord> referenceRecords = referenceProcessor.processFile(referenceFile);
+
+            inputRecordsRepository.saveAll(inputRecords);
+            referenceRecordRepository.saveAll(referenceRecords);
+
+            iGetFileServices.generateOutputFile(inputRecords, referenceRecords);
+
+            logger.info("Files processed successfully.");
+        } catch (IOException e) {
+            logger.error("Error processing files: {}", e.getMessage(), e);
         }
     }
-
-
 }

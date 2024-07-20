@@ -15,8 +15,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @OpenAPIDefinition(
 		info = @Info(
-				title = "Accounts microservice REST API Documentation",
-				description = "RedBank Accounts microservice REST API Documentation",
+				title = "Report microservice REST API Documentation",
+				description = "Natwest Assignment Report microservice REST API Documentation",
 				version = "v1",
 				contact = @Contact(
 						name = "Vijay Maurya",
@@ -30,7 +30,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 //				)
 		),
 		externalDocs = @ExternalDocumentation(
-				description =  "ReadBank Accounts microservice REST API Documentation",
+				description =  "Natwest Assignment Report microservice REST API Documentation",
 				url = "https://curaaid.com"
 		)
 )

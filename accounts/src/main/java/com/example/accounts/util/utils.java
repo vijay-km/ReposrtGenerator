@@ -3,11 +3,9 @@ package com.example.accounts.util;
 import com.example.accounts.entity.InputRecords;
 import com.example.accounts.entity.OutputRecord;
 import com.example.accounts.entity.ReferenceRecord;
-import com.example.accounts.exception.ResourceNotFoundException;
 import com.example.accounts.service.IGetFileServices;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,17 +16,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 @Component
 public class utils implements IGetFileServices {
 
-
     private static final Logger logger = LoggerFactory.getLogger(utils.class);
-    /**
-     * @param fileName 
-     * @return
-     */
-    @Value("${file.output--path}")
+
+    @Value("${file.output-path}")
     private String outputPath;
 
     @Override
@@ -39,8 +34,7 @@ public class utils implements IGetFileServices {
         return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 
-
-    public void generateOutputFile(List<InputRecords> inputRecords, List<ReferenceRecord> referenceRecords) throws IOException {
+    public List<OutputRecord> generateOutputFile(List<InputRecords> inputRecords, List<ReferenceRecord> referenceRecords) throws IOException {
         List<OutputRecord> outputRecords = new ArrayList<>();
 
         for (InputRecords input : inputRecords) {
@@ -61,14 +55,28 @@ public class utils implements IGetFileServices {
             }
         }
 
-        try (Writer writer = new FileWriter(outputPath)) {
-            StatefulBeanToCsv<OutputRecord> beanToCsv = new StatefulBeanToCsvBuilder<OutputRecord>(writer).build();
+        // Write records to file (optional)
+        File file = new File(outputPath);
+        boolean fileExists = file.exists();
+
+        // Ensure output directory exists
+        file.getParentFile().mkdirs();
+
+        try (Writer writer = new FileWriter(outputPath, true)) {
+            StatefulBeanToCsv<OutputRecord> beanToCsv = new StatefulBeanToCsvBuilder<OutputRecord>(writer)
+                    .withApplyQuotesToAll(false)
+                    .build();
+
+            if (!fileExists || file.length() == 0) {
+                writer.write("ID,OUTFIELD1,OUTFIELD2,OUTFIELD3,OUTFIELD4,OUTFIELD5\n");
+            }
+
+            // Write records
             beanToCsv.write(outputRecords);
         } catch (Exception e) {
             logger.error("Error writing CSV file: {}", e.getMessage(), e);
-
-            e.printStackTrace();
             throw new IOException("Error writing CSV file: " + e.getMessage(), e);
         }
-    }
-}
+
+        return outputRecords;
+    }}
